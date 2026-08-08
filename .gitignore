@@ -24,6 +24,13 @@ dist-ssr
 .claude/
 .lovable/
 
+# PHP backend secrets — never commit these, upload manually to Hostinger
+public_html/config/config.php
+public_html/utils/email.php
+public_html/api/test/
+public_html/.env
+public_html/*.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
