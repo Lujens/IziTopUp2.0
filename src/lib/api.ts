@@ -1,4 +1,4 @@
-export const API_BASE = "https://izitopop.com/api";
+export const API_BASE = "https://izitopups.com/api";
 
 export const TOKEN_KEY = "izitopop_token";
 export const USER_KEY = "izitopop_user";
