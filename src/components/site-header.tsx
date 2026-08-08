@@ -44,9 +44,11 @@ export function SiteHeader() {
       <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-6">
           <Link to="/" className="flex shrink-0 items-center gap-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground">
-              iZ
-            </span>
+            <img
+              src="/IziTopUp-favicon.png"
+              alt="IziTopUp"
+              className="h-8 w-8 shrink-0 object-contain"
+            />
             <span className="truncate text-lg font-extrabold tracking-tight">IziTopUp</span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">

@@ -6,12 +6,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground">
-                iZ
-              </span>
-              <span className="text-lg font-extrabold tracking-tight">IziTopUp</span>
-            </div>
+            <img src="/IziTopUp-logo.png" alt="IziTopUp" className="h-14 w-auto" />
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
               La façon la plus simple de recharger tes jeux en Haïti. Paiement MonCash, NatCash,
               carte bancaire ou portefeuille. Livraison instantanée.

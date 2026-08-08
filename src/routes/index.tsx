@@ -44,7 +44,15 @@ function HomePage() {
   return (
     <div>
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-primary-soft blur-3xl" />
+        <div className="pointer-events-none absolute inset-0">
+          <img
+            src="/hero-bg.png"
+            alt=""
+            className="h-full w-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-white/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white" />
+        </div>
         <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pt-20">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-bold text-accent-foreground">
