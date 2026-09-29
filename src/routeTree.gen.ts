@@ -19,6 +19,7 @@ import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ReinitialiserRouteImport } from './routes/reinitialiser'
 import { Route as CheckoutPackageIdRouteImport } from './routes/checkout.$packageId'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CommandeIdRouteImport } from './routes/commande.$id'
 import { Route as JeuSlugRouteImport } from './routes/jeu.$slug'
 
@@ -72,6 +73,11 @@ const CheckoutPackageIdRoute = CheckoutPackageIdRouteImport.update({
   path: '/checkout/$packageId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CommandeIdRoute = CommandeIdRouteImport.update({
   id: '/commande/$id',
   path: '/commande/$id',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reinitialiser': typeof ReinitialiserRoute
   '/checkout/$packageId': typeof CheckoutPackageIdRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/commande/$id': typeof CommandeIdRoute
   '/jeu/$slug': typeof JeuSlugRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reinitialiser': typeof ReinitialiserRoute
   '/checkout/$packageId': typeof CheckoutPackageIdRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/commande/$id': typeof CommandeIdRoute
   '/jeu/$slug': typeof JeuSlugRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reinitialiser': typeof ReinitialiserRoute
   '/checkout/$packageId': typeof CheckoutPackageIdRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/commande/$id': typeof CommandeIdRoute
   '/jeu/$slug': typeof JeuSlugRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reinitialiser'
     | '/checkout/$packageId'
+    | '/checkout/return'
     | '/commande/$id'
     | '/jeu/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reinitialiser'
     | '/checkout/$packageId'
+    | '/checkout/return'
     | '/commande/$id'
     | '/jeu/$slug'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reinitialiser'
     | '/checkout/$packageId'
+    | '/checkout/return'
     | '/commande/$id'
     | '/jeu/$slug'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ReinitialiserRoute: typeof ReinitialiserRoute
   CheckoutPackageIdRoute: typeof CheckoutPackageIdRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   CommandeIdRoute: typeof CommandeIdRoute
   JeuSlugRoute: typeof JeuSlugRoute
 }
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutPackageIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/commande/$id': {
       id: '/commande/$id'
       path: '/commande/$id'
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ReinitialiserRoute: ReinitialiserRoute,
   CheckoutPackageIdRoute: CheckoutPackageIdRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   CommandeIdRoute: CommandeIdRoute,
   JeuSlugRoute: JeuSlugRoute,
 }
