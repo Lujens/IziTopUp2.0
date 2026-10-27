@@ -25,8 +25,10 @@ dist-ssr
 .lovable/
 
 # PHP backend secrets — never commit these, upload manually to Hostinger
-public_html/config/config.php
-public_html/utils/email.php
+public_html/config/
+public_html/utils/
+/config/
+/utils/
 public_html/api/test/
 public_html/.env
 public_html/*.env
