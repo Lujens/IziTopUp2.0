@@ -208,7 +208,11 @@ export const api = {
       ),
   },
   orders: {
-    create: (body: { package_id: number | string; payment_method: PaymentMethod }) =>
+    create: (body: {
+      package_id: number | string;
+      payment_method: PaymentMethod;
+      game_uid?: string;
+    }) =>
       apiRequest<Order>("/orders/index.php?action=create", { method: "POST", body, auth: true }),
     list: () =>
       apiRequest<Order[] | { orders: Order[] }>("/orders/index.php?action=list", { auth: true }),

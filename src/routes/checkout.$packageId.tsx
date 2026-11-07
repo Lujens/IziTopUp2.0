@@ -66,6 +66,7 @@ function CheckoutPage() {
       const order = (await api.orders.create({
         package_id: packageId,
         payment_method: method,
+        ...(playerId ? { game_uid: playerId } : {}),
       })) as Order;
       const orderId = String(order.order_id ?? order.id ?? "");
       if (!orderId) throw new Error("Commande introuvable");

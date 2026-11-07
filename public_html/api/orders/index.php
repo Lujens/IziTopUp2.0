@@ -26,7 +26,6 @@ function createOrder(): void {
     $useWallet     = (bool)($data['use_wallet'] ?? false);
 
     if (!$packageId) error('Package obligatwa');
-    if (!$gameUid)   error('ID jwèt obligatwa');
     if (!in_array($paymentMethod, ['moncash','natcash','card'])) error('Metòd peman pa valid');
 
     $db = getDB();
