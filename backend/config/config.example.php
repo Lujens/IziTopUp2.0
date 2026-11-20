@@ -31,7 +31,10 @@ define('POINTS_TO_HTG_RATE',  1);
 
 define('MONCASH_CLIENT_ID', '');
 define('MONCASH_SECRET',    '');
-define('MONCASH_BASE_URL',  'https://moncashbutton.digicelgroup.com/Moncash-business');
+define('MONCASH_MODE',      'live');  // 'live' or 'sandbox' (sandbox uses sandbox.moncashbutton.digicelgroup.com)
+// In the MonCash Business portal set:
+//   Return URL: https://izitopups.com/checkout/return
+//   Alert URL:  https://api.izitopups.com/api/payments/?action=moncash-webhook
 
 define('NATCASH_MERCHANT_ID', '');
 define('NATCASH_API_KEY',     '');

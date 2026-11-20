@@ -29,10 +29,10 @@ const POLL_INTERVAL_MS = 3000;
 type VerifyState = "loading" | "success" | "failed" | "timeout" | "missing";
 
 function CheckoutReturnPage() {
-  const { orderId } = Route.useSearch();
+  const { orderId, transactionId } = Route.useSearch();
   const navigate = useNavigate();
   const { isAuthenticated, ready } = useAuth();
-  const [state, setState] = useState<VerifyState>(orderId ? "loading" : "missing");
+  const [state, setState] = useState<VerifyState>(orderId || transactionId ? "loading" : "missing");
   const [order, setOrder] = useState<Order | null>(null);
   const confettiFired = useRef(false);
 
@@ -41,7 +41,7 @@ function CheckoutReturnPage() {
   }, [ready, isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (!orderId || !ready || !isAuthenticated) return;
+    if ((!orderId && !transactionId) || !ready || !isAuthenticated) return;
     let cancelled = false;
     let attempts = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -49,7 +49,7 @@ function CheckoutReturnPage() {
     const check = async () => {
       attempts += 1;
       try {
-        const result = await api.payments.verify(orderId);
+        const result = await api.payments.verify(orderId, transactionId);
         if (cancelled) return;
 
         if (result.payment_status === "failed") {
@@ -58,7 +58,10 @@ function CheckoutReturnPage() {
         }
 
         if (result.payment_status === "paid" && result.delivery_status === "delivered") {
-          const detail = unwrapItem<Order>(await api.orders.detail(orderId), "order");
+          const detail = unwrapItem<Order>(
+            await api.orders.detail(result.order_id ?? (orderId as string)),
+            "order",
+          );
           if (cancelled) return;
           setOrder(detail);
           setState("success");
@@ -81,7 +84,7 @@ function CheckoutReturnPage() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [orderId, ready, isAuthenticated]);
+  }, [orderId, transactionId, ready, isAuthenticated]);
 
   useEffect(() => {
     if (state === "success" && !confettiFired.current) {
@@ -96,9 +99,7 @@ function CheckoutReturnPage() {
         {state === "loading" && (
           <div className="flex flex-col items-center gap-4 py-10 text-center">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="text-base font-semibold text-muted-foreground">
-              Ap verifye peman ou...
-            </p>
+            <p className="text-base font-semibold text-muted-foreground">Ap verifye peman ou...</p>
           </div>
         )}
 
@@ -143,7 +144,7 @@ function CheckoutReturnPage() {
               <div className="min-w-0">
                 <h1 className="truncate text-2xl font-extrabold sm:text-3xl">Paiement confirmé</h1>
                 <p className="truncate text-sm text-muted-foreground">
-                  Commande {order?.order_number ?? `#${orderId}`}
+                  Commande {order?.order_number ?? `#${orderId ?? ""}`}
                 </p>
               </div>
             </div>

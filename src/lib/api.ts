@@ -227,9 +227,12 @@ export const api = {
         "/payments/index.php?action=initiate",
         { method: "POST", body, auth: true },
       ),
-    verify: (orderId: string | number) =>
-      apiRequest<{ payment_status?: string; delivery_status?: string }>(
-        `/payments/index.php?action=verify&order_id=${orderId}`,
+    // MonCash sends the player back with only ?transactionId=, so accept either identifier.
+    verify: (orderId: string | number | undefined, transactionId?: string) =>
+      apiRequest<{ order_id?: number; payment_status?: string; delivery_status?: string }>(
+        `/payments/index.php?action=verify${orderId ? `&order_id=${orderId}` : ""}${
+          transactionId ? `&transaction_id=${encodeURIComponent(transactionId)}` : ""
+        }`,
         { auth: true },
       ),
   },
