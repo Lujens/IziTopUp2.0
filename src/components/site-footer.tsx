@@ -50,9 +50,20 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <p className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} IziTopUp. Tous droits réservés.
-        </p>
+        <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} IziTopUp. Tous droits réservés.</p>
+          <p>
+            Developed by{" "}
+            <a
+              href="https://lujensp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-foreground hover:text-primary hover:underline"
+            >
+              LujensP
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
