@@ -8,6 +8,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # (see backend/ in the repo). Hostinger's Git deploy replaces this folder
 # on every deploy, so nothing but this file should be placed in it.
 
+# MonCash's Alert URL is fixed in their portal as
+# https://izitopups.com/api/payments/index.php?action=moncash-webhook
+# and can't be edited, so forward that one path to the API site.
+RewriteRule ^api/payments/index\.php$ https://api.izitopups.com/api/payments/index.php [P,L]
+
 # Security headers
 Header always set X-Content-Type-Options nosniff
 Header always set X-Frame-Options DENY
