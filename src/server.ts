@@ -44,8 +44,48 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// MonCash's Alert URL is fixed in their portal as
+// https://izitopups.com/api/payments/index.php?action=moncash-webhook and can't be edited, but the
+// PHP API lives on api.izitopups.com. Forward that one request there (the API re-verifies the
+// payment with MonCash itself, so this carries no trust).
+const MONCASH_ALERT_PATH = "/api/payments/index.php";
+
+function isMoncashAlert(url: URL): boolean {
+  return (
+    url.pathname === MONCASH_ALERT_PATH && url.searchParams.get("action") === "moncash-webhook"
+  );
+}
+
+async function forwardMoncashAlert(request: Request, url: URL): Promise<Response> {
+  try {
+    const hasBody = request.method !== "GET" && request.method !== "HEAD";
+    const headers = new Headers();
+    const contentType = request.headers.get("content-type");
+    if (contentType) headers.set("content-type", contentType);
+
+    const upstream = await fetch(`https://api.izitopups.com${MONCASH_ALERT_PATH}${url.search}`, {
+      method: request.method,
+      headers,
+      ...(hasBody ? { body: await request.text() } : {}),
+    });
+    return new Response(await upstream.text(), {
+      status: upstream.status,
+      headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" },
+    });
+  } catch (error) {
+    console.error("MonCash alert forwarding failed", error);
+    return new Response(JSON.stringify({ received: false }), {
+      status: 502,
+      headers: { "content-type": "application/json" },
+    });
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    if (isMoncashAlert(url)) return forwardMoncashAlert(request, url);
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
