@@ -148,7 +148,7 @@ function initiateStripe(array $order, string $paymentMethodId): array {
             'currency'             => 'usd',
             'payment_method'       => $paymentMethodId,
             'confirm'              => 'true',
-            'return_url'           => APP_URL . '/pages/checkout-return.html',
+            'return_url'           => APP_URL . '/checkout/return?orderId=' . $order['id'],
             'metadata[order_id]'   => $order['id'],
             'metadata[order_num]'  => $order['order_number'],
         ]),

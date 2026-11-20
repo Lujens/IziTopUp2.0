@@ -4,14 +4,9 @@ RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Route API calls cleanly
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^api/auth/?(.*)$ /api/auth/index.php?action=$1 [L,QSA]
-RewriteRule ^api/products/?(.*)$ /api/products/index.php?action=$1 [L,QSA]
-RewriteRule ^api/orders/?(.*)$ /api/orders/index.php?action=$1 [L,QSA]
-RewriteRule ^api/payments/?(.*)$ /api/payments/index.php?action=$1 [L,QSA]
-RewriteRule ^api/referrals/?(.*)$ /api/referrals/index.php?action=$1 [L,QSA]
+# The PHP API no longer lives here: it is served from api.izitopups.com
+# (see backend/ in the repo). Hostinger's Git deploy replaces this folder
+# on every deploy, so nothing but this file should be placed in it.
 
 # Security headers
 Header always set X-Content-Type-Options nosniff
@@ -24,5 +19,3 @@ Header always set Referrer-Policy strict-origin-when-cross-origin
     Order Allow,Deny
     Deny from all
 </FilesMatch>
-
-

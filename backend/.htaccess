@@ -1,0 +1,31 @@
+# IziTopUp PHP API — document root of api.izitopups.com
+RewriteEngine On
+Options -Indexes
+DirectoryIndex index.php
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Make sure the Authorization (Bearer token) header reaches PHP
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Never serve backend internals (secrets, helpers) over the web
+RewriteRule ^(config|utils|middleware)(/|$) - [F,L]
+
+# Clean URLs: /api/products/list -> /api/products/index.php?action=list
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(auth|products|orders|payments|referrals)/?(.*)$ /api/$1/index.php?action=$2 [L,QSA]
+
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set Referrer-Policy strict-origin-when-cross-origin
+
+# Block sensitive files
+<FilesMatch "\.(sql|env|log|sh|git|bak|example)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

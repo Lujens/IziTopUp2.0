@@ -2,8 +2,17 @@
 require_once __DIR__ . '/../config/config.php';
 
 // ── CORS ──
+// The frontend (izitopups.com) and the API (api.izitopups.com) are different
+// origins, so reflect the request Origin when it is one of ours.
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: ' . APP_URL);
+$allowedOrigins = [
+    APP_URL,                                              // https://izitopups.com
+    preg_replace('#^https://#', 'https://www.', APP_URL), // https://www.izitopups.com
+    'http://localhost:8080',                              // local dev server
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+header('Access-Control-Allow-Origin: ' . (in_array($origin, $allowedOrigins, true) ? $origin : APP_URL));
+header('Vary: Origin');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
@@ -59,8 +68,9 @@ function validateToken(string $token): ?array {
 }
 
 function getBearerToken(): ?string {
-    $headers = getallheaders();
-    $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    $headers = function_exists('getallheaders') ? getallheaders() : [];
+    $auth = $headers['Authorization'] ?? $headers['authorization']
+        ?? $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
     if (preg_match('/Bearer\s+(.+)/i', $auth, $m)) return $m[1];
     return null;
 }
@@ -93,7 +103,7 @@ function generateOrderNumber(): string {
 }
 
 // ── LOG ──
-function logAction(int $userId = null, string $action = '', array $details = []): void {
+function logAction(?int $userId = null, string $action = '', array $details = []): void {
     try {
         $db = getDB();
         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? null;
