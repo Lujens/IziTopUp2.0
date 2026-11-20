@@ -16,7 +16,7 @@ define('SITE_URL', 'https://izitopups.com');
 define('API_URL',  'https://api.izitopups.com/api'); // used for payment callbacks
 
 // Email (Brevo SMTP) — Brevo → SMTP & API → SMTP tab
-define('MAIL_FROM',      'admin@izitopups.com');  // must be a verified sender/domain in Brevo
+define('MAIL_FROM',      'hello@izitopups.com');  // must be a verified sender/domain in Brevo
 define('MAIL_FROM_NAME', 'IziTopUp');
 define('SMTP_HOST', 'smtp-relay.brevo.com');
 define('SMTP_PORT', 587);
