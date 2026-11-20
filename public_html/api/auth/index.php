@@ -174,7 +174,7 @@ function forgotPassword(): void {
         $expires = date('Y-m-d H:i:s', time() + 1800); // 30 min
         $db->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?,?,?)")
            ->execute([$email, $token, $expires]);
-        $link = APP_URL . "/pages/reset-password.html?token=" . $token;
+        $link = APP_URL . "/reinitialiser?token=" . $token;
         emailPasswordReset($email, $user['first_name'], $link);
     }
 

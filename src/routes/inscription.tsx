@@ -126,7 +126,7 @@ function RegisterPage() {
             id="password"
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={form.password}
             onChange={update("password")}
             className="h-12 rounded-xl"
