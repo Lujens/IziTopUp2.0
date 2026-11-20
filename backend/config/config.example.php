@@ -15,7 +15,9 @@ define('APP_URL',  'https://izitopups.com');      // frontend origin (CORS + lin
 define('SITE_URL', 'https://izitopups.com');
 define('API_URL',  'https://api.izitopups.com/api'); // used for payment callbacks
 
-// Email (Brevo SMTP) — Brevo → SMTP & API → SMTP tab
+// Email (Brevo). Preferred: BREVO_API_KEY (Brevo → SMTP & API → API Keys, starts with
+// "xkeysib-"), sent over HTTPS. If it is empty, SMTP_USER / SMTP_PASS are used instead.
+define('BREVO_API_KEY', '');
 define('MAIL_FROM',      'hello@izitopups.com');  // must be a verified sender/domain in Brevo
 define('MAIL_FROM_NAME', 'IziTopUp');
 define('SMTP_HOST', 'smtp-relay.brevo.com');

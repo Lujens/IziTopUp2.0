@@ -2,11 +2,68 @@
 require_once __DIR__ . '/../config/config.php';
 
 /**
- * Send an HTML email through Brevo SMTP (STARTTLS on port 587).
- * Credentials come from config/config.php (SMTP_USER / SMTP_PASS), never from this file.
- * Every failure is written to the PHP error log with the SMTP step and server reply.
+ * Write one line to logs/email.log (blocked from the web by .htaccess) and the PHP error log.
+ * The recipient is masked so the log does not hold full addresses.
+ */
+function emailLog(string $message): void {
+    $dir = __DIR__ . '/../logs';
+    if (!is_dir($dir)) @mkdir($dir, 0750, true);
+    @file_put_contents($dir . '/email.log', '[' . date('Y-m-d H:i:s') . '] ' . $message . "\n", FILE_APPEND | LOCK_EX);
+    error_log('[email] ' . $message);
+}
+
+function maskEmail(string $email): string {
+    [$local, $domain] = array_pad(explode('@', $email, 2), 2, '');
+    return substr($local, 0, 2) . '***@' . $domain;
+}
+
+/**
+ * Send an HTML email. Uses Brevo's HTTPS API when BREVO_API_KEY is set in config.php
+ * (port 443, never blocked by the host); otherwise falls back to Brevo SMTP on port 587.
  */
 function sendEmail(string $toEmail, string $toName, string $subject, string $htmlBody): bool {
+    $ok = (defined('BREVO_API_KEY') && BREVO_API_KEY !== '')
+        ? sendEmailViaApi($toEmail, $toName, $subject, $htmlBody)
+        : sendEmailViaSmtp($toEmail, $toName, $subject, $htmlBody);
+    if ($ok) emailLog('sent "' . $subject . '" to ' . maskEmail($toEmail));
+    return $ok;
+}
+
+function sendEmailViaApi(string $toEmail, string $toName, string $subject, string $htmlBody): bool {
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_HTTPHEADER     => [
+            'api-key: ' . BREVO_API_KEY,
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ],
+        CURLOPT_POSTFIELDS     => json_encode([
+            'sender'      => ['name' => MAIL_FROM_NAME, 'email' => MAIL_FROM],
+            'to'          => [['email' => $toEmail, 'name' => $toName ?: $toEmail]],
+            'subject'     => $subject,
+            'htmlContent' => $htmlBody,
+        ]),
+    ]);
+    $response = curl_exec($ch);
+    $code     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        emailLog('Brevo API request failed: ' . $curlErr);
+        return false;
+    }
+    if ($code < 200 || $code >= 300) {
+        emailLog("Brevo API rejected email to " . maskEmail($toEmail) . " (HTTP {$code}): " . substr((string)$response, 0, 300));
+        return false;
+    }
+    return true;
+}
+
+function sendEmailViaSmtp(string $toEmail, string $toName, string $subject, string $htmlBody): bool {
     $host     = defined('SMTP_HOST') ? SMTP_HOST : 'smtp-relay.brevo.com';
     $port     = defined('SMTP_PORT') ? SMTP_PORT : 587;
     $user     = defined('SMTP_USER') ? SMTP_USER : '';
@@ -15,13 +72,13 @@ function sendEmail(string $toEmail, string $toName, string $subject, string $htm
     $fromName = MAIL_FROM_NAME;
 
     if ($user === '' || $pass === '') {
-        error_log("[email] SMTP_USER / SMTP_PASS missing in config.php — email to {$toEmail} not sent");
+        emailLog("SMTP: SMTP_USER / SMTP_PASS missing in config.php — email to " . maskEmail($toEmail) . " not sent");
         return false;
     }
 
     $socket = @fsockopen($host, $port, $errno, $errstr, 15);
     if (!$socket) {
-        error_log("[email] cannot connect to {$host}:{$port} — {$errno} {$errstr}");
+        emailLog("SMTP: cannot connect to {$host}:{$port} — {$errno} {$errstr}");
         return false;
     }
     stream_set_timeout($socket, 15);
@@ -40,7 +97,7 @@ function sendEmail(string $toEmail, string $toName, string $subject, string $htm
         if ($command !== '') fwrite($socket, $command . "\r\n");
         $reply = $read();
         if (strpos($reply, $expect) !== 0) {
-            error_log("[email] SMTP failed at {$step}: " . trim($reply));
+            emailLog("SMTP: failed at {$step}: " . trim($reply));
             return false;
         }
         return true;
@@ -51,7 +108,7 @@ function sendEmail(string $toEmail, string $toName, string $subject, string $htm
         && $cmd('STARTTLS', '220', 'STARTTLS');
 
     if ($ok && !stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-        error_log('[email] TLS negotiation failed');
+        emailLog('SMTP: TLS negotiation failed');
         $ok = false;
     }
 

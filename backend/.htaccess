@@ -12,7 +12,7 @@ RewriteCond %{HTTP:Authorization} .
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
 # Never serve backend internals (secrets, helpers) over the web
-RewriteRule ^(config|utils|middleware)(/|$) - [F,L]
+RewriteRule ^(config|utils|middleware|logs)(/|$) - [F,L]
 
 # Clean URLs: /api/products/list -> /api/products/index.php?action=list
 RewriteCond %{REQUEST_FILENAME} !-f
