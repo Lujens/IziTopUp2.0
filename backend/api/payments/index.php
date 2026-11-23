@@ -291,21 +291,34 @@ function verifyPayment(): void {
 // ── MONCASH WEBHOOK (Alert URL) ──
 // The body is only a hint: the payment is re-fetched from MonCash and matched to an order by
 // the reference MonCash returns, so a forged call can't mark anything paid.
+// MonCash may call this URL two ways: server-to-server (POST) to notify us, and by sending the
+// customer's browser here (GET ?transactionId=...). A browser must end up back on the site, so
+// GET requests are settled and then redirected to the return page.
 function moncashWebhook(): void {
     $data          = getInput();
     $transactionId = trim((string)($data['transactionId'] ?? $data['transaction_id'] ?? ($_GET['transactionId'] ?? '')));
     if ($transactionId === '') { http_response_code(400); exit; }
 
+    $isBrowser = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET';
+
     $payment = moncashRetrievePayment($transactionId, null);
+    $order   = null;
+    if ($payment) {
+        $db   = getDB();
+        $stmt = $db->prepare("SELECT * FROM orders WHERE order_number = ?");
+        $stmt->execute([(string)($payment['reference'] ?? '')]);
+        $order = $stmt->fetch() ?: null;
+        if ($order) settleMoncashPayment($order, $payment);
+    }
+
+    if ($isBrowser) {
+        // The return page re-checks the payment itself, so this works even if settling above failed.
+        header('Location: ' . APP_URL . '/checkout/return?transactionId=' . urlencode($transactionId), true, 302);
+        exit;
+    }
+
     if (!$payment) { http_response_code(202); echo json_encode(['received' => true]); exit; }
-
-    $db   = getDB();
-    $stmt = $db->prepare("SELECT * FROM orders WHERE order_number = ?");
-    $stmt->execute([(string)($payment['reference'] ?? '')]);
-    $order = $stmt->fetch();
-    if (!$order) { http_response_code(404); exit; }
-
-    settleMoncashPayment($order, $payment);
+    if (!$order)   { http_response_code(404); exit; }
 
     http_response_code(200);
     echo json_encode(['received' => true]);

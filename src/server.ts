@@ -66,11 +66,19 @@ async function forwardMoncashAlert(request: Request, url: URL): Promise<Response
     const upstream = await fetch(`https://api.izitopups.com${MONCASH_ALERT_PATH}${url.search}`, {
       method: request.method,
       headers,
+      // Don't follow the API's redirect for browsers: hand it back so the customer's browser
+      // lands on the return page.
+      redirect: "manual",
       ...(hasBody ? { body: await request.text() } : {}),
     });
+    const responseHeaders = new Headers({
+      "content-type": upstream.headers.get("content-type") ?? "application/json",
+    });
+    const location = upstream.headers.get("location");
+    if (location) responseHeaders.set("location", location);
     return new Response(await upstream.text(), {
       status: upstream.status,
-      headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" },
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error("MonCash alert forwarding failed", error);
