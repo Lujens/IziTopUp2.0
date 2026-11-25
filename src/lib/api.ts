@@ -142,6 +142,8 @@ export type Order = {
   price_htg?: string | number;
   product_name?: string;
   package_name?: string;
+  /** What the PHP API actually returns for the package name. */
+  package_label?: string;
   created_at?: string;
   [key: string]: unknown;
 };

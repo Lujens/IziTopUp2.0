@@ -138,7 +138,11 @@ function AccountPage() {
   };
 
   if (!ready) {
-    return <div className="mx-auto max-w-6xl px-4 py-20 text-muted-foreground">{t("common.loading")}</div>;
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-20 text-muted-foreground">
+        {t("common.loading")}
+      </div>
+    );
   }
 
   return (
@@ -200,7 +204,9 @@ function AccountPage() {
         </TabsList>
 
         <TabsContent value="orders" className="mt-6">
-          {ordersQuery.isLoading && <p className="text-sm text-muted-foreground">{t("common.loading")}</p>}
+          {ordersQuery.isLoading && (
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
+          )}
           {!ordersQuery.isLoading && orders.length === 0 && (
             <div className="rounded-3xl bg-secondary/70 p-8 text-center">
               <p className="font-bold">Aucune commande pour l'instant</p>
@@ -221,7 +227,8 @@ function AccountPage() {
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold">
-                      {order.product_name ?? "Recharge"} · {order.package_name ?? ""}
+                      {order.product_name ?? "Recharge"} ·{" "}
+                      {order.package_name ?? order.package_label ?? ""}
                     </p>
                     <p className="mt-1 truncate text-xs text-muted-foreground">
                       {order.order_number ?? `#${orderId}`} · {formatDate(order.created_at)}

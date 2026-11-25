@@ -156,7 +156,9 @@ function CheckoutReturnPage() {
               </div>
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-muted-foreground">Package</dt>
-                <dd className="truncate font-semibold">{order?.package_name ?? "—"}</dd>
+                <dd className="truncate font-semibold">
+                  {order?.package_name ?? order?.package_label ?? "—"}
+                </dd>
               </div>
             </dl>
 
